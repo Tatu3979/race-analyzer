@@ -4,7 +4,7 @@
 
 ## 公開 URL
 
-（Phase 1 デプロイ後にここに記載）
+https://race-analyzer-2026.web.app
 
 ## 特徴
 
