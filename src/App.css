@@ -1,0 +1,18 @@
+/* Phase 1: 最小スタイルのみ。各コンポーネント追加時に拡張する。 */
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.app-header h1 {
+  font-size: 2rem;
+  margin: 0 0 8px;
+}
+
+.lede {
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
