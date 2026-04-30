@@ -1,4 +1,5 @@
 import FitParser from 'fit-file-parser';
+import type { SegmentRecord } from './segment-analyzer';
 
 export type LapSummary = {
   index: number;
@@ -10,12 +11,23 @@ export type LapSummary = {
 };
 
 type RawLap = {
+  start_time?: string;
   total_distance?: number;
   total_timer_time?: number;
   total_elapsed_time?: number;
   avg_heart_rate?: number;
   avg_cadence?: number;
   avg_fractional_cadence?: number;
+};
+
+type RawRecord = {
+  timestamp?: string;
+  distance?: number;
+  heart_rate?: number;
+  cadence?: number;
+  fractional_cadence?: number;
+  stance_time?: number;
+  vertical_ratio?: number;
 };
 
 export async function parseFitFile(file: File): Promise<unknown> {
@@ -35,6 +47,49 @@ export function extractLaps(parseResult: unknown): LapSummary[] {
   return laps
     .map((lap, i) => buildLapSummary(lap, i))
     .filter((s): s is LapSummary => s !== null);
+}
+
+export function extractRecordsForLap(
+  parseResult: unknown,
+  lapIndex: number
+): SegmentRecord[] {
+  const laps = collectLaps(parseResult);
+  const lap = laps[lapIndex - 1];
+  if (!lap || !lap.start_time) return [];
+
+  const lapStartMs = Date.parse(lap.start_time);
+  if (Number.isNaN(lapStartMs)) return [];
+  const durationSec = lap.total_timer_time ?? lap.total_elapsed_time ?? 0;
+  const lapEndMs = lapStartMs + durationSec * 1000;
+
+  const records = collectRecords(parseResult);
+  const filtered = records
+    .map((r) => {
+      if (!r.timestamp) return null;
+      const ts = Date.parse(r.timestamp);
+      if (Number.isNaN(ts)) return null;
+      if (ts < lapStartMs || ts > lapEndMs) return null;
+      return { raw: r, ts };
+    })
+    .filter((x): x is { raw: RawRecord; ts: number } => x !== null);
+
+  if (filtered.length === 0) return [];
+
+  const baseDistance = filtered[0].raw.distance ?? 0;
+  return filtered.map(({ raw, ts }) => ({
+    timestampMs: ts,
+    distanceM: (raw.distance ?? baseDistance) - baseDistance,
+    heartRate: raw.heart_rate,
+    cadence: raw.cadence,
+    fractionalCadence: raw.fractional_cadence,
+    stanceTime: raw.stance_time,
+    verticalRatio: raw.vertical_ratio,
+  }));
+}
+
+function collectRecords(parseResult: unknown): RawRecord[] {
+  const root = parseResult as { records?: RawRecord[] } | null;
+  return root?.records ?? [];
 }
 
 function collectLaps(parseResult: unknown): RawLap[] {
