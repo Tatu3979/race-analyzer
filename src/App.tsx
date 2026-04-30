@@ -9,6 +9,7 @@ import Stage1Form from './components/Stage1Form';
 import Stage2Bridge from './components/Stage2Bridge';
 import { stage1Template } from './templates/stage1';
 import { stage2Template } from './templates/stage2';
+import { stage3Template } from './templates/stage3';
 import { fillTemplate } from './templates/fillTemplate';
 import {
   emptyRaceForm,
@@ -83,6 +84,7 @@ function App() {
   const stage2Values =
     stage1Values != null ? buildStage2Values(stage1Values, stage1to2, periodMode) : null;
   const stage2Prompt = stage2Values ? fillTemplate(stage2Template, stage2Values) : '';
+  const stage3Prompt = stage2Values ? fillTemplate(stage3Template, stage2Values) : '';
 
   const scopeLabel =
     selectedLapIndex == null
@@ -147,6 +149,10 @@ function App() {
             periodMode={periodMode}
           />
           <PromptOutput stage={2} prompt={stage2Prompt} />
+          <p className="bridge-form-guide">
+            Stage 2 のプロンプトを AI に投げて推奨手法を確認してから、以下のプロンプトを実行してください。
+          </p>
+          <PromptOutput stage={3} prompt={stage3Prompt} />
         </section>
       )}
 
