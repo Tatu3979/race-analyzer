@@ -57,8 +57,8 @@ describe('stage2Template integration', () => {
     );
     const out = fillTemplate(stage2Template, stage2);
     expect(out).not.toMatch(/\{[a-zA-Z]\w*\}/);
-    expect(out).toContain('LT2');
-    expect(out).toContain('持久力');
+    expect(out).toContain('Stage 1 で特定');
     expect(out).toContain('180');
+    expect(out).toContain('長期');
   });
 });
