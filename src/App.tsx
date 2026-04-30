@@ -81,6 +81,17 @@ function App() {
   const stage2Prompt = stage2Values ? fillTemplate(stage2Template, stage2Values) : '';
   const stage3Prompt = stage2Values ? fillTemplate(stage3Template, stage2Values) : '';
 
+  const missingFields: string[] = [];
+  if (!raceForm.goalDistance) missingFields.push('主目標距離');
+  if (raceForm.goalDistance === 'カスタム' && !raceForm.goalDistanceCustom.trim())
+    missingFields.push('カスタム距離');
+  if (!raceForm.goalTimeH && !raceForm.goalTimeM && !raceForm.goalTimeS)
+    missingFields.push('目標タイム');
+  if (!raceForm.raceDate) missingFields.push('レース日');
+  if (!raceForm.monthlyMileage) missingFields.push('月間距離');
+  if (!raceForm.maxSingleRunDistance) missingFields.push('過去30日最長距離');
+  const promptsReady = missingFields.length === 0;
+
   const scopeLabel =
     selectedLapIndex == null
       ? `全体 (${formatDistance(totalDistanceM / 1000)}, ${segments.length} 区間)`
@@ -140,9 +151,17 @@ function App() {
             Gemini での使用を推奨します。各 Stage を <strong>同じチャット内</strong> で順に投げてください。前ステージの応答は次ステージで自動的に参照されます。
           </p>
           <Stage1Form values={raceForm} onChange={setRaceForm} />
-          <PromptOutput stage={1} prompt={stage1Prompt} />
-          <PromptOutput stage={2} prompt={stage2Prompt} />
-          <PromptOutput stage={3} prompt={stage3Prompt} />
+          {promptsReady ? (
+            <>
+              <PromptOutput stage={1} prompt={stage1Prompt} />
+              <PromptOutput stage={2} prompt={stage2Prompt} />
+              <PromptOutput stage={3} prompt={stage3Prompt} />
+            </>
+          ) : (
+            <p className="phase4-pending">
+              必須項目を入力するとプロンプトが表示されます: {missingFields.join('、')}
+            </p>
+          )}
         </section>
       )}
 
