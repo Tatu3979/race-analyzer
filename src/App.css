@@ -268,6 +268,94 @@
   color: #6b7280;
 }
 
+.manual-laps {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.manual-laps > legend {
+  padding: 0 6px;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.manual-laps-hint {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.manual-laps-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.manual-laps-row {
+  display: grid;
+  grid-template-columns: 28px 80px 56px 56px 64px 64px 80px 28px;
+  gap: 4px;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.manual-laps-header > span {
+  color: #6b7280;
+  text-align: center;
+}
+
+.manual-laps-num {
+  color: #6b7280;
+  text-align: right;
+}
+
+.manual-laps-row > input {
+  width: 100%;
+  padding: 4px 6px;
+  font: inherit;
+  text-align: right;
+}
+
+.manual-laps-remove {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #94a3b8;
+}
+
+.manual-laps-remove:hover:not(:disabled) {
+  border-color: #f87171;
+  color: #dc2626;
+}
+
+.manual-laps-remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.manual-laps-add {
+  align-self: flex-start;
+  padding: 4px 12px;
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  border-radius: 4px;
+}
+
+.manual-laps-add:hover {
+  border-color: #94a3b8;
+}
+
 .phase4 {
   margin-top: 32px;
   padding-top: 16px;
