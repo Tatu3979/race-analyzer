@@ -41,7 +41,7 @@ describe('stage1Template integration', () => {
         subGoalDate: '2026-08-01',
       },
       segments,
-      segmentSize: 1000,
+      segmentSizeLabel: '1km',
       totalDistanceM: 5000,
       totalTimerTime: 1200,
       today: FIXED_TODAY,

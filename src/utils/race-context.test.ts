@@ -220,7 +220,7 @@ describe('buildStage1Values', () => {
         maxSingleRunDistance: '32',
       },
       segments: sampleSegments,
-      segmentSize: 1000,
+      segmentSizeLabel: '1km',
       totalDistanceM: 5000,
       totalTimerTime: 1200,
       today: FIXED_TODAY,
@@ -239,7 +239,7 @@ describe('buildStage1Values', () => {
     const values = buildStage1Values({
       raceForm: { ...emptyRaceForm, raceDate: '2026-08-01' },
       segments: [],
-      segmentSize: 200,
+      segmentSizeLabel: '200m',
       totalDistanceM: 0,
       totalTimerTime: 0,
       today: FIXED_TODAY,

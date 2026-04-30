@@ -23,6 +23,7 @@ import {
   computePhaseDistribution,
   computeWeeksUntil,
   derivePeriodMode,
+  formatSegmentSize,
 } from './utils/race-context';
 import { splitIntoSegments, type SegmentSize } from './utils/segment-analyzer';
 
@@ -65,7 +66,7 @@ function App() {
       ? buildStage1Values({
           raceForm,
           segments,
-          segmentSize,
+          segmentSizeLabel: formatSegmentSize(segmentSize),
           totalDistanceM,
           totalTimerTime,
         })

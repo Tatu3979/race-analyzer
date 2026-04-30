@@ -40,7 +40,7 @@ describe('stage2Template integration', () => {
         maxSingleRunDistance: '32',
       },
       segments,
-      segmentSize: 1000,
+      segmentSizeLabel: '1km',
       totalDistanceM: 5000,
       totalTimerTime: 1200,
       today: FIXED_TODAY,

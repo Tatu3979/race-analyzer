@@ -100,12 +100,12 @@ export function formatSegmentData(segments: SegmentMetrics[]): string {
 export function buildStage1Values(args: {
   raceForm: RaceFormValues;
   segments: SegmentMetrics[];
-  segmentSize: SegmentSize;
+  segmentSizeLabel: string;
   totalDistanceM: number;
   totalTimerTime: number;
   today?: Date;
 }): Record<string, string> {
-  const { raceForm, segments, segmentSize, totalDistanceM, totalTimerTime, today } = args;
+  const { raceForm, segments, segmentSizeLabel, totalDistanceM, totalTimerTime, today } = args;
   const totalDistanceKm = totalDistanceM / 1000;
   const pacePerKmSec = totalDistanceKm > 0 ? totalTimerTime / totalDistanceKm : 0;
   return {
@@ -127,7 +127,7 @@ export function buildStage1Values(args: {
     dataDistance: formatDistance(totalDistanceKm),
     dataTime: formatDuration(totalTimerTime),
     dataPace: formatPace(pacePerKmSec),
-    segmentSize: formatSegmentSize(segmentSize),
+    segmentSize: segmentSizeLabel,
     segmentData: formatSegmentData(segments),
   };
 }
