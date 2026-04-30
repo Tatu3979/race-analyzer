@@ -264,12 +264,11 @@ legend {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  overflow-x: auto;
 }
 
 .manual-laps-row {
   display: grid;
-  grid-template-columns: 28px 88px 60px 60px 72px 72px 88px 32px;
+  grid-template-columns: 28px 1fr 70px 70px 80px 80px 1fr 32px;
   gap: 6px;
   align-items: center;
   font-size: 0.85rem;
@@ -286,7 +285,19 @@ legend {
   text-align: right;
 }
 
-.manual-laps-row > input {
+/* On desktop the <label> wrappers shouldn't take up grid columns themselves;
+   we want the inputs to align with the header row, so make the wrapper transparent.
+   The visible label texts are hidden because the header row already labels the
+   columns. */
+.manual-laps-field {
+  display: contents;
+}
+
+.manual-laps-field > span {
+  display: none;
+}
+
+.manual-laps-row input {
   width: 100%;
   padding: 6px 8px;
   font: inherit;
@@ -297,7 +308,7 @@ legend {
   color: var(--text);
 }
 
-.manual-laps-row > input:focus {
+.manual-laps-row input:focus {
   outline: none;
   border-color: var(--accent-blue);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
@@ -541,5 +552,58 @@ legend {
 
   .prompt-output-actions > button {
     width: 100%;
+  }
+
+  /* Manual laps: each lap becomes its own card */
+  .manual-laps-header {
+    display: none;
+  }
+
+  .manual-laps-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px;
+    background: var(--bg-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    align-items: end;
+  }
+
+  .manual-laps-num {
+    grid-column: 1 / -1;
+    text-align: left;
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+
+  .manual-laps-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .manual-laps-field > span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .manual-laps-row input {
+    text-align: left;
+  }
+
+  .manual-laps-remove {
+    grid-column: 1 / -1;
+    width: auto;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+  }
+
+  .manual-laps-remove::before {
+    content: 'このラップを削除';
+    margin-right: 4px;
   }
 }

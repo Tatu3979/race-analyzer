@@ -40,51 +40,70 @@ export default function ManualLapForm({ laps, onChange }: Props) {
         {laps.map((lap, i) => (
           <div className="manual-laps-row" key={i}>
             <span className="manual-laps-num">{i + 1}</span>
-            <input
-              type="number"
-              min={0}
-              step="0.01"
-              value={lap.distanceKm}
-              onChange={(e) => updateLap(i, 'distanceKm', e.target.value)}
-            />
-            <input
-              type="number"
-              min={0}
-              value={lap.durationM}
-              onChange={(e) => updateLap(i, 'durationM', e.target.value)}
-            />
-            <input
-              type="number"
-              min={0}
-              max={59}
-              value={lap.durationS}
-              onChange={(e) => updateLap(i, 'durationS', e.target.value)}
-            />
-            <input
-              type="number"
-              min={0}
-              value={lap.avgHeartRate}
-              onChange={(e) => updateLap(i, 'avgHeartRate', e.target.value)}
-            />
-            <input
-              type="number"
-              min={0}
-              value={lap.avgPitchSpm}
-              onChange={(e) => updateLap(i, 'avgPitchSpm', e.target.value)}
-            />
-            <input
-              type="number"
-              min={0}
-              step="0.01"
-              value={lap.avgStrideM}
-              onChange={(e) => updateLap(i, 'avgStrideM', e.target.value)}
-            />
+            <label className="manual-laps-field">
+              <span>距離 (km)</span>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                value={lap.distanceKm}
+                onChange={(e) => updateLap(i, 'distanceKm', e.target.value)}
+              />
+            </label>
+            <label className="manual-laps-field">
+              <span>分</span>
+              <input
+                type="number"
+                min={0}
+                value={lap.durationM}
+                onChange={(e) => updateLap(i, 'durationM', e.target.value)}
+              />
+            </label>
+            <label className="manual-laps-field">
+              <span>秒</span>
+              <input
+                type="number"
+                min={0}
+                max={59}
+                value={lap.durationS}
+                onChange={(e) => updateLap(i, 'durationS', e.target.value)}
+              />
+            </label>
+            <label className="manual-laps-field">
+              <span>心拍</span>
+              <input
+                type="number"
+                min={0}
+                value={lap.avgHeartRate}
+                onChange={(e) => updateLap(i, 'avgHeartRate', e.target.value)}
+              />
+            </label>
+            <label className="manual-laps-field">
+              <span>ピッチ</span>
+              <input
+                type="number"
+                min={0}
+                value={lap.avgPitchSpm}
+                onChange={(e) => updateLap(i, 'avgPitchSpm', e.target.value)}
+              />
+            </label>
+            <label className="manual-laps-field">
+              <span>ストライド (m)</span>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                value={lap.avgStrideM}
+                onChange={(e) => updateLap(i, 'avgStrideM', e.target.value)}
+              />
+            </label>
             <button
               type="button"
               className="manual-laps-remove"
               onClick={() => removeLap(i)}
               disabled={laps.length === 1}
               title="このラップを削除"
+              aria-label={`ラップ ${i + 1} を削除`}
             >
               ×
             </button>
