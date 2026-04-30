@@ -249,3 +249,25 @@
   padding: 4px 6px;
   font: inherit;
 }
+
+.bridge-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.bridge-form-guide {
+  margin: 0;
+  padding: 8px 12px;
+  background: #fef3c7;
+  border-left: 3px solid #f59e0b;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.bridge-form-note {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 0.85rem;
+}

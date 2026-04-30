@@ -6,16 +6,28 @@ import PromptOutput from './components/PromptOutput';
 import SegmentChart from './components/SegmentChart';
 import SegmentControls from './components/SegmentControls';
 import Stage1Form from './components/Stage1Form';
+import Stage2Bridge from './components/Stage2Bridge';
 import { stage1Template } from './templates/stage1';
+import { stage2Template } from './templates/stage2';
 import { fillTemplate } from './templates/fillTemplate';
-import { emptyRaceForm, type RaceFormValues } from './templates/types';
+import {
+  emptyRaceForm,
+  emptyStage1to2,
+  type RaceFormValues,
+  type Stage1to2Values,
+} from './templates/types';
 import {
   extractAllRecords,
   extractLaps,
   extractRecordsForLap,
   formatDistance,
 } from './utils/fit-analyzer';
-import { buildStage1Values } from './utils/race-context';
+import {
+  buildStage1Values,
+  buildStage2Values,
+  computeWeeksUntil,
+  derivePeriodMode,
+} from './utils/race-context';
 import { splitIntoSegments, type SegmentSize } from './utils/segment-analyzer';
 
 function pickDefaultSegmentSize(totalDistanceM: number): SegmentSize {
@@ -30,6 +42,7 @@ function App() {
   const [selectedLapIndex, setSelectedLapIndex] = useState<number | null>(null);
   const [segmentSize, setSegmentSize] = useState<SegmentSize>(1000);
   const [raceForm, setRaceForm] = useState<RaceFormValues>(emptyRaceForm);
+  const [stage1to2, setStage1to2] = useState<Stage1to2Values>(emptyStage1to2);
 
   const laps = parseResult ? extractLaps(parseResult) : [];
 
@@ -63,6 +76,13 @@ function App() {
         })
       : null;
   const stage1Prompt = stage1Values ? fillTemplate(stage1Template, stage1Values) : '';
+
+  const weeksUntilRace = computeWeeksUntil(raceForm.raceDate);
+  const periodMode = derivePeriodMode(weeksUntilRace);
+
+  const stage2Values =
+    stage1Values != null ? buildStage2Values(stage1Values, stage1to2, periodMode) : null;
+  const stage2Prompt = stage2Values ? fillTemplate(stage2Template, stage2Values) : '';
 
   const scopeLabel =
     selectedLapIndex == null
@@ -121,6 +141,12 @@ function App() {
           <h2>AI 相談用プロンプト</h2>
           <Stage1Form values={raceForm} onChange={setRaceForm} />
           <PromptOutput stage={1} prompt={stage1Prompt} />
+          <Stage2Bridge
+            values={stage1to2}
+            onChange={setStage1to2}
+            periodMode={periodMode}
+          />
+          <PromptOutput stage={2} prompt={stage2Prompt} />
         </section>
       )}
 
