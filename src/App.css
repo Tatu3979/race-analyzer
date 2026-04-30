@@ -171,3 +171,41 @@
 .segment-chart {
   margin-top: 16px;
 }
+
+.prompt-output {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prompt-output h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.prompt-output-body {
+  max-height: 320px;
+  overflow: auto;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.prompt-output-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.prompt-output-hint {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
