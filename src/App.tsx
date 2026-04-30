@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './App.css';
 import FileUploader from './components/FileUploader';
 import LapTable from './components/LapTable';
+import ManualLapForm from './components/ManualLapForm';
 import PromptOutput from './components/PromptOutput';
 import SegmentChart from './components/SegmentChart';
 import SegmentControls from './components/SegmentControls';
@@ -18,6 +19,13 @@ import {
   formatDistance,
 } from './utils/fit-analyzer';
 import {
+  emptyManualLap,
+  manualLapsToSegments,
+  manualLapsTotalDistanceM,
+  manualLapsTotalTimerTime,
+  type ManualLap,
+} from './utils/manual-laps';
+import {
   buildStage1Values,
   buildStage2Values,
   computePhaseDistribution,
@@ -25,7 +33,13 @@ import {
   derivePeriodMode,
   formatSegmentSize,
 } from './utils/race-context';
-import { splitIntoSegments, type SegmentSize } from './utils/segment-analyzer';
+import {
+  splitIntoSegments,
+  type SegmentMetrics,
+  type SegmentSize,
+} from './utils/segment-analyzer';
+
+type InputMode = 'fit' | 'manual';
 
 function pickDefaultSegmentSize(totalDistanceM: number): SegmentSize {
   if (totalDistanceM >= 10000) return 1000;
@@ -34,41 +48,53 @@ function pickDefaultSegmentSize(totalDistanceM: number): SegmentSize {
 }
 
 function App() {
+  const [inputMode, setInputMode] = useState<InputMode>('fit');
   const [parseResult, setParseResult] = useState<unknown>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedLapIndex, setSelectedLapIndex] = useState<number | null>(null);
   const [segmentSize, setSegmentSize] = useState<SegmentSize>(1000);
   const [raceForm, setRaceForm] = useState<RaceFormValues>(emptyRaceForm);
+  const [manualLaps, setManualLaps] = useState<ManualLap[]>([{ ...emptyManualLap }]);
 
+  // FIT mode derived data
   const laps = parseResult ? extractLaps(parseResult) : [];
-
   const segmentRecords =
     parseResult == null
       ? []
       : selectedLapIndex == null
         ? extractAllRecords(parseResult)
         : extractRecordsForLap(parseResult, selectedLapIndex);
-
-  const segments =
+  const fitSegments =
     segmentRecords.length > 0 ? splitIntoSegments(segmentRecords, segmentSize) : [];
-
-  const totalDistanceM =
+  const fitTotalDistanceM =
     segmentRecords.length > 0 ? segmentRecords[segmentRecords.length - 1].distanceM : 0;
-
-  const totalTimerTime =
+  const fitTotalTimerTime =
     segmentRecords.length > 0
       ? (segmentRecords[segmentRecords.length - 1].timestampMs - segmentRecords[0].timestampMs) /
         1000
       : 0;
 
+  // Manual mode derived data
+  const manualSegments: SegmentMetrics[] =
+    inputMode === 'manual' ? manualLapsToSegments(manualLaps) : [];
+  const manualTotalDistanceM = manualLapsTotalDistanceM(manualLaps);
+  const manualTotalTimerTime = manualLapsTotalTimerTime(manualLaps);
+
+  // Effective values per mode
+  const effectiveSegments = inputMode === 'fit' ? fitSegments : manualSegments;
+  const effectiveTotalDistanceM = inputMode === 'fit' ? fitTotalDistanceM : manualTotalDistanceM;
+  const effectiveTotalTimerTime = inputMode === 'fit' ? fitTotalTimerTime : manualTotalTimerTime;
+  const effectiveSegmentLabel =
+    inputMode === 'fit' ? formatSegmentSize(segmentSize) : 'ラップ単位';
+
   const stage1Values =
-    segments.length > 0
+    effectiveSegments.length > 0
       ? buildStage1Values({
           raceForm,
-          segments,
-          segmentSizeLabel: formatSegmentSize(segmentSize),
-          totalDistanceM,
-          totalTimerTime,
+          segments: effectiveSegments,
+          segmentSizeLabel: effectiveSegmentLabel,
+          totalDistanceM: effectiveTotalDistanceM,
+          totalTimerTime: effectiveTotalTimerTime,
         })
       : null;
   const stage1Prompt = stage1Values ? fillTemplate(stage1Template, stage1Values) : '';
@@ -91,82 +117,117 @@ function App() {
   if (!raceForm.raceDate) missingFields.push('レース日');
   if (!raceForm.monthlyMileage) missingFields.push('月間距離');
   if (!raceForm.maxSingleRunDistance) missingFields.push('過去30日最長距離');
+  if (effectiveSegments.length === 0) {
+    missingFields.push(
+      inputMode === 'fit' ? 'FITファイル' : 'ラップデータ（距離 + タイム）',
+    );
+  }
   const promptsReady = missingFields.length === 0;
 
   const scopeLabel =
     selectedLapIndex == null
-      ? `全体 (${formatDistance(totalDistanceM / 1000)}, ${segments.length} 区間)`
-      : `Lap ${selectedLapIndex} (${formatDistance(totalDistanceM / 1000)}, ${segments.length} 区間)`;
+      ? `全体 (${formatDistance(fitTotalDistanceM / 1000)}, ${fitSegments.length} 区間)`
+      : `Lap ${selectedLapIndex} (${formatDistance(fitTotalDistanceM / 1000)}, ${fitSegments.length} 区間)`;
 
   return (
     <main className="app">
       <header className="app-header">
         <h1>Race Analyzer</h1>
         <p className="lede">
-          FITファイルから区間ごとの走行データを分析し、AI相談用のプロンプトを生成します。
+          FITファイルまたはラップ手入力から、AI相談用のプロンプトを生成します。
         </p>
       </header>
 
-      <FileUploader
-        onParsed={(result) => {
-          setParseResult(result);
-          setErrorMessage(null);
-          setSelectedLapIndex(null);
-          const all = extractAllRecords(result);
-          if (all.length > 0) {
-            setSegmentSize(pickDefaultSegmentSize(all[all.length - 1].distanceM));
-          }
-        }}
-        onError={(msg) => {
-          setErrorMessage(msg);
-          setParseResult(null);
-          setSelectedLapIndex(null);
-        }}
-      />
+      <fieldset className="input-mode">
+        <legend>データ入力方法</legend>
+        <label>
+          <input
+            type="radio"
+            name="input-mode"
+            value="fit"
+            checked={inputMode === 'fit'}
+            onChange={() => setInputMode('fit')}
+          />
+          FITファイル（Garmin等のPC連携）
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="input-mode"
+            value="manual"
+            checked={inputMode === 'manual'}
+            onChange={() => setInputMode('manual')}
+          />
+          ラップ手入力（時計の表示を見ながら入力）
+        </label>
+      </fieldset>
 
-      {errorMessage && <p className="error">{errorMessage}</p>}
+      {inputMode === 'fit' && (
+        <>
+          <FileUploader
+            onParsed={(result) => {
+              setParseResult(result);
+              setErrorMessage(null);
+              setSelectedLapIndex(null);
+              const all = extractAllRecords(result);
+              if (all.length > 0) {
+                setSegmentSize(pickDefaultSegmentSize(all[all.length - 1].distanceM));
+              }
+            }}
+            onError={(msg) => {
+              setErrorMessage(msg);
+              setParseResult(null);
+              setSelectedLapIndex(null);
+            }}
+          />
 
-      {segments.length > 0 && (
-        <section className="analysis">
-          <div className="scope-bar">
-            <span className="scope-label">範囲: {scopeLabel}</span>
-            {selectedLapIndex != null && (
-              <button
-                type="button"
-                className="scope-reset"
-                onClick={() => setSelectedLapIndex(null)}
-              >
-                全体に戻る
-              </button>
-            )}
-          </div>
-          <SegmentControls size={segmentSize} onChange={setSegmentSize} />
-          <SegmentChart segments={segments} />
-        </section>
-      )}
+          {errorMessage && <p className="error">{errorMessage}</p>}
 
-      {segments.length > 0 && (
-        <section className="phase4">
-          <h2>AI 相談用プロンプト</h2>
-          <p className="phase4-recommend">
-            Gemini での使用を推奨します。各 Stage を <strong>同じチャット内</strong> で順に投げてください。前ステージの応答は次ステージで自動的に参照されます。
-          </p>
-          <Stage1Form values={raceForm} onChange={setRaceForm} />
-          {promptsReady ? (
-            <>
-              <PromptOutput stage={1} prompt={stage1Prompt} />
-              <PromptOutput stage={2} prompt={stage2Prompt} />
-              <PromptOutput stage={3} prompt={stage3Prompt} />
-            </>
-          ) : (
-            <p className="phase4-pending">
-              必須項目を入力するとプロンプトが表示されます: {missingFields.join('、')}
-            </p>
+          {fitSegments.length > 0 && (
+            <section className="analysis">
+              <div className="scope-bar">
+                <span className="scope-label">範囲: {scopeLabel}</span>
+                {selectedLapIndex != null && (
+                  <button
+                    type="button"
+                    className="scope-reset"
+                    onClick={() => setSelectedLapIndex(null)}
+                  >
+                    全体に戻る
+                  </button>
+                )}
+              </div>
+              <SegmentControls size={segmentSize} onChange={setSegmentSize} />
+              <SegmentChart segments={fitSegments} />
+            </section>
           )}
-        </section>
+        </>
       )}
 
-      {parseResult != null && (
+      {inputMode === 'manual' && (
+        <ManualLapForm laps={manualLaps} onChange={setManualLaps} />
+      )}
+
+      <section className="phase4">
+        <h2>AI 相談用プロンプト</h2>
+        <p className="phase4-recommend">
+          Gemini での使用を推奨します。各 Stage を <strong>同じチャット内</strong> で順に投げてください。前ステージの応答は次ステージで自動的に参照されます。
+        </p>
+        <Stage1Form values={raceForm} onChange={setRaceForm} />
+        {promptsReady ? (
+          <>
+            <PromptOutput stage={1} prompt={stage1Prompt} />
+            <PromptOutput stage={2} prompt={stage2Prompt} />
+            <PromptOutput stage={3} prompt={stage3Prompt} />
+          </>
+        ) : (
+          <p className="phase4-pending">
+            必須項目を入力するとプロンプトが表示されます: {missingFields.join('、')}
+          </p>
+        )}
+      </section>
+
+      {inputMode === 'fit' && parseResult != null && (
         <LapTable
           laps={laps}
           selectedIndex={selectedLapIndex}
