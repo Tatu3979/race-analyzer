@@ -495,3 +495,51 @@ legend {
   color: var(--text-muted);
   font-size: 0.8rem;
 }
+
+/* ---------- Mobile adjustments ---------- */
+@media (max-width: 600px) {
+  .app {
+    padding: 16px 12px 48px;
+    gap: 16px;
+  }
+
+  .input-mode,
+  .race-form-section,
+  .manual-laps,
+  .analysis,
+  .phase4 {
+    padding: 14px 14px;
+  }
+
+  .race-form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .race-form-row > span {
+    min-width: 0;
+    font-size: 0.8rem;
+  }
+
+  .race-form-time {
+    flex: 1 1 auto;
+  }
+
+  .race-form-time > input {
+    width: 100%;
+    flex: 1 1 0;
+  }
+
+  .scope-bar {
+    font-size: 0.85rem;
+  }
+
+  .prompt-output-actions {
+    flex-direction: column;
+  }
+
+  .prompt-output-actions > button {
+    width: 100%;
+  }
+}
