@@ -110,3 +110,34 @@
   margin-top: 24px;
   color: #6b7280;
 }
+
+.lap-table input[type='radio'] {
+  cursor: pointer;
+}
+
+.segment-controls {
+  margin-top: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px 14px 10px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.segment-controls legend {
+  font-size: 0.85rem;
+  color: #475569;
+  padding: 0 6px;
+}
+
+.segment-controls-option {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.segment-chart {
+  margin-top: 16px;
+}
