@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { parseFitFile } from '../utils/fit-analyzer';
-import { getSampleFiles } from '../utils/sample-files';
+import type { SampleFile } from '../utils/sample-files';
 
 type Props = {
   onParsed: (result: unknown) => void;
@@ -17,7 +17,15 @@ function isFitFile(file: File): boolean {
 
 export default function FileUploader({ onParsed, onError }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const samples = getSampleFiles();
+  const [samples, setSamples] = useState<SampleFile[]>([]);
+
+  // sample-files モジュールは dev でのみ動的 import する。
+  // import.meta.env.DEV は本番ビルド時に false リテラルへ置換され、
+  // この import 文ごと Rollup の DCE で削除される（→ samples/*.fit がバンドルに混入しない）。
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    void import('../utils/sample-files').then((m) => setSamples(m.getSampleFiles()));
+  }, []);
 
   const ingest = useCallback(
     async (file: File) => {

@@ -1,8 +1,15 @@
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import FileUploader from './components/FileUploader';
+import LapTable from './components/LapTable';
+import { extractLaps } from './utils/fit-analyzer';
 
-// Phase 1 ではタイトルだけのシンプルなシェル。
-// Phase 2 以降で state と各コンポーネント (FileUploader, LapTable, ...) を順に追加していく起点。
 function App() {
+  const [parseResult, setParseResult] = useState<unknown>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const laps = parseResult ? extractLaps(parseResult) : [];
+
   return (
     <main className="app">
       <header className="app-header">
@@ -11,8 +18,22 @@ function App() {
           FITファイルから区間ごとの走行データを分析し、AI相談用のプロンプトを生成します。
         </p>
       </header>
+
+      <FileUploader
+        onParsed={(result) => {
+          setParseResult(result);
+          setErrorMessage(null);
+        }}
+        onError={(msg) => {
+          setErrorMessage(msg);
+          setParseResult(null);
+        }}
+      />
+
+      {errorMessage && <p className="error">{errorMessage}</p>}
+      {parseResult != null && <LapTable laps={laps} />}
     </main>
-  )
+  );
 }
 
-export default App
+export default App;
