@@ -2,14 +2,20 @@ import { useState } from 'react';
 import './App.css';
 import FileUploader from './components/FileUploader';
 import LapTable from './components/LapTable';
+import PromptOutput from './components/PromptOutput';
 import SegmentChart from './components/SegmentChart';
 import SegmentControls from './components/SegmentControls';
+import Stage1Form from './components/Stage1Form';
+import { stage1Template } from './templates/stage1';
+import { fillTemplate } from './templates/fillTemplate';
+import { emptyRaceForm, type RaceFormValues } from './templates/types';
 import {
   extractAllRecords,
   extractLaps,
   extractRecordsForLap,
   formatDistance,
 } from './utils/fit-analyzer';
+import { buildStage1Values } from './utils/race-context';
 import { splitIntoSegments, type SegmentSize } from './utils/segment-analyzer';
 
 function pickDefaultSegmentSize(totalDistanceM: number): SegmentSize {
@@ -23,6 +29,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedLapIndex, setSelectedLapIndex] = useState<number | null>(null);
   const [segmentSize, setSegmentSize] = useState<SegmentSize>(1000);
+  const [raceForm, setRaceForm] = useState<RaceFormValues>(emptyRaceForm);
 
   const laps = parseResult ? extractLaps(parseResult) : [];
 
@@ -38,6 +45,24 @@ function App() {
 
   const totalDistanceM =
     segmentRecords.length > 0 ? segmentRecords[segmentRecords.length - 1].distanceM : 0;
+
+  const totalTimerTime =
+    segmentRecords.length > 0
+      ? (segmentRecords[segmentRecords.length - 1].timestampMs - segmentRecords[0].timestampMs) /
+        1000
+      : 0;
+
+  const stage1Values =
+    segments.length > 0
+      ? buildStage1Values({
+          raceForm,
+          segments,
+          segmentSize,
+          totalDistanceM,
+          totalTimerTime,
+        })
+      : null;
+  const stage1Prompt = stage1Values ? fillTemplate(stage1Template, stage1Values) : '';
 
   const scopeLabel =
     selectedLapIndex == null
@@ -88,6 +113,14 @@ function App() {
           </div>
           <SegmentControls size={segmentSize} onChange={setSegmentSize} />
           <SegmentChart segments={segments} />
+        </section>
+      )}
+
+      {segments.length > 0 && (
+        <section className="phase4">
+          <h2>AI 相談用プロンプト</h2>
+          <Stage1Form values={raceForm} onChange={setRaceForm} />
+          <PromptOutput stage={1} prompt={stage1Prompt} />
         </section>
       )}
 
