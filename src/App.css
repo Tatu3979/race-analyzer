@@ -209,3 +209,43 @@
   color: #6b7280;
   font-size: 0.85rem;
 }
+
+.race-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.race-form-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.race-form-section > legend {
+  padding: 0 6px;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.race-form-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.race-form-row > span {
+  min-width: 160px;
+  color: #475569;
+}
+
+.race-form-row > input,
+.race-form-row > select {
+  flex: 1;
+  padding: 4px 6px;
+  font: inherit;
+}
