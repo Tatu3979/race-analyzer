@@ -11,27 +11,17 @@
   --text-muted: #5f6368;
   --text-inverse: #ffffff;
 
-  /* Gemini accents */
-  --accent-blue: #4285f4;
-  --accent-purple: #9b72cb;
-  --accent-pink: #d96570;
-  --accent-grad: linear-gradient(
-    90deg,
-    #4285f4 0%,
-    #9b72cb 55%,
-    #d96570 100%
-  );
-  --accent-grad-hover: linear-gradient(
-    90deg,
-    #1a73e8 0%,
-    #8b5dbf 55%,
-    #c8525d 100%
-  );
+  /* Accents (blue → indigo, brand-neutral) */
+  --accent-blue: #3b82f6;
+  --accent-indigo: #6366f1;
+  --accent-danger: #ef4444;
+  --accent-grad: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+  --accent-grad-hover: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);
 
   /* Semantic tints */
-  --info-bg: #e8f0fe;
-  --info-text: #1a56c9;
-  --info-border: #aecbfa;
+  --info-bg: #eff6ff;
+  --info-text: #1d4ed8;
+  --info-border: #bfdbfe;
   --warn-bg: #fef7e0;
   --warn-text: #8a5300;
   --warn-border: #fde293;

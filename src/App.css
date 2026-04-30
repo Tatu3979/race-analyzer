@@ -217,7 +217,7 @@ legend {
 .race-form-row > select:focus {
   outline: none;
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }
 
 .race-form-time {
@@ -240,7 +240,7 @@ legend {
 .race-form-time > input:focus {
   outline: none;
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }
 
 .race-form-time > span {
@@ -300,7 +300,7 @@ legend {
 .manual-laps-row > input:focus {
   outline: none;
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }
 
 .manual-laps-remove {
@@ -317,8 +317,8 @@ legend {
 }
 
 .manual-laps-remove:hover:not(:disabled) {
-  border-color: var(--accent-pink);
-  color: var(--accent-pink);
+  border-color: var(--accent-danger);
+  color: var(--accent-danger);
 }
 
 .manual-laps-remove:disabled {
