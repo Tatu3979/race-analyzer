@@ -87,6 +87,31 @@ export function extractRecordsForLap(
   }));
 }
 
+export function extractAllRecords(parseResult: unknown): SegmentRecord[] {
+  const records = collectRecords(parseResult);
+  const valid = records
+    .map((r) => {
+      if (!r.timestamp) return null;
+      const ts = Date.parse(r.timestamp);
+      if (Number.isNaN(ts)) return null;
+      return { raw: r, ts };
+    })
+    .filter((x): x is { raw: RawRecord; ts: number } => x !== null);
+
+  if (valid.length === 0) return [];
+
+  const baseDistance = valid[0].raw.distance ?? 0;
+  return valid.map(({ raw, ts }) => ({
+    timestampMs: ts,
+    distanceM: (raw.distance ?? baseDistance) - baseDistance,
+    heartRate: raw.heart_rate,
+    cadence: raw.cadence,
+    fractionalCadence: raw.fractional_cadence,
+    stanceTime: raw.stance_time,
+    verticalRatio: raw.vertical_ratio,
+  }));
+}
+
 function collectRecords(parseResult: unknown): RawRecord[] {
   const root = parseResult as { records?: RawRecord[] } | null;
   return root?.records ?? [];
