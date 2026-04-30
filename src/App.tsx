@@ -31,7 +31,9 @@ function App() {
       />
 
       {errorMessage && <p className="error">{errorMessage}</p>}
-      {parseResult != null && <LapTable laps={laps} />}
+      {parseResult != null && (
+        <LapTable laps={laps} selectedIndex={null} onSelect={() => {}} />
+      )}
     </main>
   );
 }
