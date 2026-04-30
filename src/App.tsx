@@ -132,7 +132,7 @@ function App() {
   return (
     <main className="app">
       <header className="app-header">
-        <h1>Race Analyzer</h1>
+        <img className="app-logo" src="/logo.svg" alt="Race Analyzer" />
         <p className="lede">
           FITファイルまたはラップ手入力から、AI相談用のプロンプトを生成します。
         </p>
