@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   buildStage1Values,
   buildStage2Values,
+  composeTime,
   computePhaseDistribution,
   computeWeeksUntil,
   derivePeriodMode,
@@ -119,6 +120,24 @@ describe('formatGoalDistance', () => {
   });
 });
 
+describe('composeTime', () => {
+  it('returns empty string when all parts are empty', () => {
+    expect(composeTime('', '', '')).toBe('');
+  });
+
+  it('zero-pads minutes and seconds', () => {
+    expect(composeTime('3', '5', '7')).toBe('3:05:07');
+  });
+
+  it('uses 0 for missing hour when minutes or seconds are filled', () => {
+    expect(composeTime('', '42', '0')).toBe('0:42:00');
+  });
+
+  it('coerces non-numeric values to 0', () => {
+    expect(composeTime('a', 'b', 'c')).toBe('0:00:00');
+  });
+});
+
 describe('formatSegmentSize', () => {
   it('formats by size', () => {
     expect(formatSegmentSize(200)).toBe('200m');
@@ -193,7 +212,9 @@ describe('buildStage1Values', () => {
       raceForm: {
         ...emptyRaceForm,
         goalDistance: 'フル',
-        goalTime: '3:30:00',
+        goalTimeH: '3',
+        goalTimeM: '30',
+        goalTimeS: '00',
         raceDate: '2026-10-01',
         monthlyMileage: '180',
         maxSingleRunDistance: '32',

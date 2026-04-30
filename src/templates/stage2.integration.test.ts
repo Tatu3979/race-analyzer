@@ -32,7 +32,9 @@ describe('stage2Template integration', () => {
       raceForm: {
         ...emptyRaceForm,
         goalDistance: 'フル',
-        goalTime: '3:30:00',
+        goalTimeH: '3',
+        goalTimeM: '30',
+        goalTimeS: '00',
         raceDate: '2026-10-01',
         monthlyMileage: '180',
         maxSingleRunDistance: '32',

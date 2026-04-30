@@ -250,6 +250,24 @@
   font: inherit;
 }
 
+.race-form-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.race-form-time > input {
+  width: 4em;
+  padding: 4px 6px;
+  font: inherit;
+  text-align: right;
+}
+
+.race-form-time > span {
+  color: #6b7280;
+}
+
 .phase4 {
   margin-top: 32px;
   padding-top: 16px;

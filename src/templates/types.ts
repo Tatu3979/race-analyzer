@@ -14,26 +14,34 @@ export type GoalDistanceKey =
 export type RaceFormValues = {
   goalDistance: GoalDistanceKey | '';
   goalDistanceCustom: string;
-  goalTime: string;
+  goalTimeH: string;
+  goalTimeM: string;
+  goalTimeS: string;
   raceDate: string;
   monthlyMileage: string;
   maxSingleRunDistance: string;
   subGoalDistance: GoalDistanceKey | '';
   subGoalDistanceCustom: string;
-  subGoalTime: string;
+  subGoalTimeH: string;
+  subGoalTimeM: string;
+  subGoalTimeS: string;
   subGoalDate: string;
 };
 
 export const emptyRaceForm: RaceFormValues = {
   goalDistance: '',
   goalDistanceCustom: '',
-  goalTime: '',
+  goalTimeH: '',
+  goalTimeM: '',
+  goalTimeS: '',
   raceDate: '',
   monthlyMileage: '',
   maxSingleRunDistance: '',
   subGoalDistance: '',
   subGoalDistanceCustom: '',
-  subGoalTime: '',
+  subGoalTimeH: '',
+  subGoalTimeM: '',
+  subGoalTimeS: '',
   subGoalDate: '',
 };
 

@@ -49,15 +49,36 @@ export default function Stage1Form({ values, onChange }: Props) {
             />
           </label>
         )}
-        <label className="race-form-row">
+        <div className="race-form-row">
           <span>目標タイム</span>
-          <input
-            type="text"
-            placeholder="H:MM:SS（例: 3:30:00）"
-            value={values.goalTime}
-            onChange={(e) => update('goalTime', e.target.value)}
-          />
-        </label>
+          <div className="race-form-time">
+            <input
+              type="number"
+              min={0}
+              placeholder="時"
+              value={values.goalTimeH}
+              onChange={(e) => update('goalTimeH', e.target.value)}
+            />
+            <span>:</span>
+            <input
+              type="number"
+              min={0}
+              max={59}
+              placeholder="分"
+              value={values.goalTimeM}
+              onChange={(e) => update('goalTimeM', e.target.value)}
+            />
+            <span>:</span>
+            <input
+              type="number"
+              min={0}
+              max={59}
+              placeholder="秒"
+              value={values.goalTimeS}
+              onChange={(e) => update('goalTimeS', e.target.value)}
+            />
+          </div>
+        </div>
         <label className="race-form-row">
           <span>レース日</span>
           <input
@@ -95,15 +116,36 @@ export default function Stage1Form({ values, onChange }: Props) {
             />
           </label>
         )}
-        <label className="race-form-row">
+        <div className="race-form-row">
           <span>目標タイム</span>
-          <input
-            type="text"
-            placeholder="H:MM:SS"
-            value={values.subGoalTime}
-            onChange={(e) => update('subGoalTime', e.target.value)}
-          />
-        </label>
+          <div className="race-form-time">
+            <input
+              type="number"
+              min={0}
+              placeholder="時"
+              value={values.subGoalTimeH}
+              onChange={(e) => update('subGoalTimeH', e.target.value)}
+            />
+            <span>:</span>
+            <input
+              type="number"
+              min={0}
+              max={59}
+              placeholder="分"
+              value={values.subGoalTimeM}
+              onChange={(e) => update('subGoalTimeM', e.target.value)}
+            />
+            <span>:</span>
+            <input
+              type="number"
+              min={0}
+              max={59}
+              placeholder="秒"
+              value={values.subGoalTimeS}
+              onChange={(e) => update('subGoalTimeS', e.target.value)}
+            />
+          </div>
+        </div>
         <label className="race-form-row">
           <span>レース日</span>
           <input

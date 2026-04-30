@@ -63,6 +63,14 @@ export function formatGoalDistance(
   return key;
 }
 
+export function composeTime(h: string, m: string, s: string): string {
+  if (h === '' && m === '' && s === '') return '';
+  const hh = h === '' ? '0' : String(Math.max(0, Number(h) | 0));
+  const mm = (m === '' ? 0 : Math.max(0, Number(m) | 0)).toString().padStart(2, '0');
+  const ss = (s === '' ? 0 : Math.max(0, Number(s) | 0)).toString().padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
 export function formatSegmentSize(size: SegmentSize): string {
   if (size === 1000) return '1km';
   return `${size}m`;
@@ -102,11 +110,15 @@ export function buildStage1Values(args: {
   const pacePerKmSec = totalDistanceKm > 0 ? totalTimerTime / totalDistanceKm : 0;
   return {
     goalDistance: formatGoalDistance(raceForm.goalDistance, raceForm.goalDistanceCustom),
-    goalTime: raceForm.goalTime,
+    goalTime: composeTime(raceForm.goalTimeH, raceForm.goalTimeM, raceForm.goalTimeS),
     raceDate: raceForm.raceDate,
     weeksUntilRace: String(computeWeeksUntil(raceForm.raceDate, today)),
     subGoalDistance: formatGoalDistance(raceForm.subGoalDistance, raceForm.subGoalDistanceCustom),
-    subGoalTime: raceForm.subGoalTime,
+    subGoalTime: composeTime(
+      raceForm.subGoalTimeH,
+      raceForm.subGoalTimeM,
+      raceForm.subGoalTimeS,
+    ),
     subGoalDate: raceForm.subGoalDate,
     weeksUntilSubGoal: String(computeWeeksUntil(raceForm.subGoalDate, today)),
     monthlyMileage: raceForm.monthlyMileage,
