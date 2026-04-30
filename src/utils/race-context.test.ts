@@ -11,7 +11,7 @@ import {
   formatSegmentSize,
 } from './race-context';
 import type { SegmentMetrics } from './segment-analyzer';
-import { emptyRaceForm, emptyStage1to2 } from '../templates/types';
+import { emptyRaceForm } from '../templates/types';
 
 const FIXED_TODAY = new Date('2026-04-30T00:00:00');
 
@@ -233,35 +233,28 @@ describe('buildStage1Values', () => {
 describe('buildStage2Values', () => {
   const base = { foo: 'bar' };
 
-  it('passes phase weeks through verbatim', () => {
-    const values = buildStage2Values(
-      base,
-      {
-        ...emptyStage1to2,
-        strengthCategory: 'LT2',
-        weaknessCategory: '持久力',
-        phase1Weeks: '12',
-        phase2Weeks: '9',
-        phase3Weeks: '6',
-        phase4Weeks: '3',
-        currentPhase: '基礎期',
-        subGoalPositioning: '練習の一環（テーパーなし）',
-        achievabilityEvaluation: '達成可能',
-      },
-      '長期',
-    );
+  it('merges base, periodMode, and computed phase weeks', () => {
+    const values = buildStage2Values(base, '長期', {
+      phase1: 12,
+      phase2: 9,
+      phase3: 6,
+      phase4: 3,
+    });
     expect(values.foo).toBe('bar');
-    expect(values.strengthCategory).toBe('LT2');
-    expect(values.weaknessCategory).toBe('持久力');
     expect(values.periodMode).toBe('長期');
     expect(values.phase1Weeks).toBe('12');
-    expect(values.currentPhase).toBe('基礎期');
-    expect(values.subGoalPositioning).toBe('練習の一環（テーパーなし）');
-    expect(values.achievabilityEvaluation).toBe('達成可能');
+    expect(values.phase2Weeks).toBe('9');
+    expect(values.phase3Weeks).toBe('6');
+    expect(values.phase4Weeks).toBe('3');
   });
 
-  it('keeps empty phase weeks for short/middle modes', () => {
-    const values = buildStage2Values(base, emptyStage1to2, '短期');
+  it('keeps empty phase weeks when distribution is all zero', () => {
+    const values = buildStage2Values(base, '短期', {
+      phase1: 0,
+      phase2: 0,
+      phase3: 0,
+      phase4: 0,
+    });
     expect(values.phase1Weeks).toBe('');
     expect(values.phase2Weeks).toBe('');
     expect(values.periodMode).toBe('短期');

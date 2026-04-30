@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { stage3Template } from './stage3';
 import { fillTemplate } from './fillTemplate';
-import { buildStage1Values, buildStage2Values } from '../utils/race-context';
-import { emptyRaceForm, emptyStage1to2 } from './types';
+import {
+  buildStage1Values,
+  buildStage2Values,
+  computePhaseDistribution,
+} from '../utils/race-context';
+import { emptyRaceForm } from './types';
 import type { SegmentMetrics } from '../utils/segment-analyzer';
 
 const FIXED_TODAY = new Date('2026-04-30T00:00:00');
@@ -42,24 +46,30 @@ describe('stage3Template integration', () => {
       totalTimerTime: 1200,
       today: FIXED_TODAY,
     });
-    const stage2 = buildStage2Values(
-      stage1,
-      {
-        ...emptyStage1to2,
-        strengthCategory: 'LT2',
-        weaknessCategory: '持久力',
-        phase1Weeks: '9',
-        phase2Weeks: '7',
-        phase3Weeks: '4',
-        phase4Weeks: '2',
-        currentPhase: '基礎期',
-        subGoalPositioning: '練習の一環（テーパーなし）',
-        achievabilityEvaluation: '達成可能',
-      },
-      '長期',
-    );
+    const stage2 = buildStage2Values(stage1, '長期', computePhaseDistribution(22));
     const out = fillTemplate(stage3Template, stage2);
     expect(out).not.toMatch(/\{[a-zA-Z]\w*\}/);
     expect(out).toContain('基礎期');
+  });
+
+  it('still fills phase2Weeks placeholder for short/middle modes (allows empty)', () => {
+    const stage1 = buildStage1Values({
+      raceForm: {
+        ...emptyRaceForm,
+        goalDistance: '5000m',
+        goalTime: '0:18:00',
+        raceDate: '2026-05-15',
+        monthlyMileage: '120',
+        maxSingleRunDistance: '15',
+      },
+      segments,
+      segmentSize: 200,
+      totalDistanceM: 5000,
+      totalTimerTime: 1100,
+      today: FIXED_TODAY,
+    });
+    const stage2 = buildStage2Values(stage1, '短期', computePhaseDistribution(2));
+    const out = fillTemplate(stage3Template, stage2);
+    expect(out).not.toMatch(/\{[a-zA-Z]\w*\}/);
   });
 });

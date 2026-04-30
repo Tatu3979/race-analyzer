@@ -4,7 +4,6 @@ import type {
   GoalDistanceKey,
   PeriodMode,
   RaceFormValues,
-  Stage1to2Values,
 } from '../templates/types';
 
 const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -123,20 +122,16 @@ export function buildStage1Values(args: {
 
 export function buildStage2Values(
   base: Record<string, string>,
-  stage1to2: Stage1to2Values,
   periodMode: PeriodMode,
+  phases: { phase1: number; phase2: number; phase3: number; phase4: number },
 ): Record<string, string> {
+  const fmt = (n: number) => (n > 0 ? String(n) : '');
   return {
     ...base,
-    strengthCategory: stage1to2.strengthCategory,
-    weaknessCategory: stage1to2.weaknessCategory,
     periodMode,
-    phase1Weeks: stage1to2.phase1Weeks,
-    phase2Weeks: stage1to2.phase2Weeks,
-    phase3Weeks: stage1to2.phase3Weeks,
-    phase4Weeks: stage1to2.phase4Weeks,
-    currentPhase: stage1to2.currentPhase,
-    subGoalPositioning: stage1to2.subGoalPositioning,
-    achievabilityEvaluation: stage1to2.achievabilityEvaluation,
+    phase1Weeks: fmt(phases.phase1),
+    phase2Weeks: fmt(phases.phase2),
+    phase3Weeks: fmt(phases.phase3),
+    phase4Weeks: fmt(phases.phase4),
   };
 }
