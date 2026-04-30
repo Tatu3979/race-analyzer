@@ -4,8 +4,19 @@ import FileUploader from './components/FileUploader';
 import LapTable from './components/LapTable';
 import SegmentChart from './components/SegmentChart';
 import SegmentControls from './components/SegmentControls';
-import { extractLaps, extractRecordsForLap } from './utils/fit-analyzer';
+import {
+  extractAllRecords,
+  extractLaps,
+  extractRecordsForLap,
+  formatDistance,
+} from './utils/fit-analyzer';
 import { splitIntoSegments, type SegmentSize } from './utils/segment-analyzer';
+
+function pickDefaultSegmentSize(totalDistanceM: number): SegmentSize {
+  if (totalDistanceM >= 10000) return 1000;
+  if (totalDistanceM >= 3000) return 500;
+  return 200;
+}
 
 function App() {
   const [parseResult, setParseResult] = useState<unknown>(null);
@@ -14,12 +25,24 @@ function App() {
   const [segmentSize, setSegmentSize] = useState<SegmentSize>(1000);
 
   const laps = parseResult ? extractLaps(parseResult) : [];
+
   const segmentRecords =
-    parseResult != null && selectedLapIndex != null
-      ? extractRecordsForLap(parseResult, selectedLapIndex)
-      : [];
+    parseResult == null
+      ? []
+      : selectedLapIndex == null
+        ? extractAllRecords(parseResult)
+        : extractRecordsForLap(parseResult, selectedLapIndex);
+
   const segments =
     segmentRecords.length > 0 ? splitIntoSegments(segmentRecords, segmentSize) : [];
+
+  const totalDistanceM =
+    segmentRecords.length > 0 ? segmentRecords[segmentRecords.length - 1].distanceM : 0;
+
+  const scopeLabel =
+    selectedLapIndex == null
+      ? `全体 (${formatDistance(totalDistanceM / 1000)}, ${segments.length} 区間)`
+      : `Lap ${selectedLapIndex} (${formatDistance(totalDistanceM / 1000)}, ${segments.length} 区間)`;
 
   return (
     <main className="app">
@@ -35,6 +58,10 @@ function App() {
           setParseResult(result);
           setErrorMessage(null);
           setSelectedLapIndex(null);
+          const all = extractAllRecords(result);
+          if (all.length > 0) {
+            setSegmentSize(pickDefaultSegmentSize(all[all.length - 1].distanceM));
+          }
         }}
         onError={(msg) => {
           setErrorMessage(msg);
@@ -44,19 +71,32 @@ function App() {
       />
 
       {errorMessage && <p className="error">{errorMessage}</p>}
+
+      {segments.length > 0 && (
+        <section className="analysis">
+          <div className="scope-bar">
+            <span className="scope-label">範囲: {scopeLabel}</span>
+            {selectedLapIndex != null && (
+              <button
+                type="button"
+                className="scope-reset"
+                onClick={() => setSelectedLapIndex(null)}
+              >
+                全体に戻る
+              </button>
+            )}
+          </div>
+          <SegmentControls size={segmentSize} onChange={setSegmentSize} />
+          <SegmentChart segments={segments} />
+        </section>
+      )}
+
       {parseResult != null && (
         <LapTable
           laps={laps}
           selectedIndex={selectedLapIndex}
           onSelect={setSelectedLapIndex}
         />
-      )}
-
-      {segments.length > 0 && (
-        <>
-          <SegmentControls size={segmentSize} onChange={setSegmentSize} />
-          <SegmentChart segments={segments} />
-        </>
       )}
     </main>
   );

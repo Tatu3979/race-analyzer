@@ -115,8 +115,38 @@
   cursor: pointer;
 }
 
-.segment-controls {
+.analysis {
   margin-top: 24px;
+}
+
+.scope-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.scope-label {
+  font-size: 0.95rem;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.scope-reset {
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.scope-reset:hover {
+  background: #f1f5f9;
+}
+
+.segment-controls {
+  margin-top: 0;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   padding: 8px 14px 10px;

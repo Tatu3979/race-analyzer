@@ -31,12 +31,15 @@ export default function SegmentChart({ segments }: Props) {
     strideM: s.avgStrideM == null ? null : Math.round(s.avgStrideM * 100) / 100,
   }));
 
+  // X軸ラベルを最大 ~20 個に間引く（長距離FITで全表示すると詰まって読めないため）
+  const labelInterval = data.length > 20 ? Math.ceil(data.length / 20) - 1 : 0;
+
   return (
     <div className="segment-chart">
       <ResponsiveContainer width="100%" height={400}>
         <ComposedChart data={data} margin={{ top: 16, right: 56, bottom: 8, left: 8 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="label" />
+          <XAxis dataKey="label" interval={labelInterval} />
           <YAxis
             yAxisId="pace"
             orientation="left"
