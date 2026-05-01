@@ -123,6 +123,7 @@ export function buildStage1Values(args: {
     weeksUntilSubGoal: String(computeWeeksUntil(raceForm.subGoalDate, today)),
     monthlyMileage: raceForm.monthlyMileage,
     maxSingleRunDistance: raceForm.maxSingleRunDistance,
+    maxHr: raceForm.maxHr,
     dataType: deriveDataType(totalDistanceM),
     dataDistance: formatDistance(totalDistanceKm),
     dataTime: formatDuration(totalTimerTime),

@@ -178,6 +178,17 @@ export default function Stage1Form({ values, onChange }: Props) {
             onChange={(e) => update('maxSingleRunDistance', e.target.value)}
           />
         </label>
+        <label className="race-form-row">
+          <span>最大心拍数 (bpm)</span>
+          <input
+            type="number"
+            min={0}
+            step={1}
+            placeholder="任意（例: 188）"
+            value={values.maxHr}
+            onChange={(e) => update('maxHr', e.target.value)}
+          />
+        </label>
       </fieldset>
     </form>
   );

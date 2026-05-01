@@ -40,6 +40,7 @@ import {
 } from './utils/segment-analyzer';
 
 type InputMode = 'fit' | 'manual';
+type StepNumber = 1 | 2 | 3 | 4;
 
 function pickDefaultSegmentSize(totalDistanceM: number): SegmentSize {
   if (totalDistanceM >= 10000) return 1000;
@@ -48,7 +49,8 @@ function pickDefaultSegmentSize(totalDistanceM: number): SegmentSize {
 }
 
 function App() {
-  const [inputMode, setInputMode] = useState<InputMode>('fit');
+  const [currentStep, setCurrentStep] = useState<StepNumber>(1);
+  const [inputMode, setInputMode] = useState<InputMode | null>(null);
   const [parseResult, setParseResult] = useState<unknown>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedLapIndex, setSelectedLapIndex] = useState<number | null>(null);
@@ -108,62 +110,85 @@ function App() {
   const stage2Prompt = stage2Values ? fillTemplate(stage2Template, stage2Values) : '';
   const stage3Prompt = stage2Values ? fillTemplate(stage3Template, stage2Values) : '';
 
-  const missingFields: string[] = [];
-  if (!raceForm.goalDistance) missingFields.push('主目標距離');
+  // Per-step validity
+  const step1Valid = inputMode != null;
+  const step2Valid =
+    inputMode === 'fit'
+      ? errorMessage == null && fitSegments.length > 0
+      : inputMode === 'manual'
+        ? manualSegments.length > 0
+        : false;
+  const raceFormMissing: string[] = [];
+  if (!raceForm.goalDistance) raceFormMissing.push('主目標距離');
   if (raceForm.goalDistance === 'カスタム' && !raceForm.goalDistanceCustom.trim())
-    missingFields.push('カスタム距離');
+    raceFormMissing.push('カスタム距離');
   if (!raceForm.goalTimeH && !raceForm.goalTimeM && !raceForm.goalTimeS)
-    missingFields.push('目標タイム');
-  if (!raceForm.raceDate) missingFields.push('レース日');
-  if (!raceForm.monthlyMileage) missingFields.push('月間距離');
-  if (!raceForm.maxSingleRunDistance) missingFields.push('過去30日最長距離');
-  if (effectiveSegments.length === 0) {
-    missingFields.push(
-      inputMode === 'fit' ? 'FITファイル' : 'ラップデータ（距離 + タイム）',
-    );
-  }
-  const promptsReady = missingFields.length === 0;
+    raceFormMissing.push('目標タイム');
+  if (!raceForm.raceDate) raceFormMissing.push('レース日');
+  if (!raceForm.monthlyMileage) raceFormMissing.push('月間距離');
+  if (!raceForm.maxSingleRunDistance) raceFormMissing.push('過去30日最長距離');
+  const step3Valid = raceFormMissing.length === 0;
 
   const scopeLabel =
     selectedLapIndex == null
       ? `全体 (${formatDistance(fitTotalDistanceM / 1000)}, ${fitSegments.length} 区間)`
       : `Lap ${selectedLapIndex} (${formatDistance(fitTotalDistanceM / 1000)}, ${fitSegments.length} 区間)`;
 
+  function goNext() {
+    if (currentStep === 1 && step1Valid) setCurrentStep(2);
+    else if (currentStep === 2 && step2Valid) setCurrentStep(3);
+    else if (currentStep === 3 && step3Valid) setCurrentStep(4);
+  }
+  function goBack() {
+    if (currentStep > 1) setCurrentStep((currentStep - 1) as StepNumber);
+  }
+
   return (
     <main className="app">
       <header className="app-header">
         <img className="app-logo" src="/logo.webp" alt="Race Analyzer" />
-        <p className="lede">
-          FITファイルまたはラップ手入力から、AI相談用のプロンプトを生成します。
-        </p>
+        <p className="step-indicator">Step {currentStep} / 4</p>
       </header>
 
-      <fieldset className="input-mode">
-        <legend>データ入力方法</legend>
-        <label>
-          <input
-            type="radio"
-            name="input-mode"
-            value="fit"
-            checked={inputMode === 'fit'}
-            onChange={() => setInputMode('fit')}
-          />
-          FITファイル（Garmin等のPC連携）
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="input-mode"
-            value="manual"
-            checked={inputMode === 'manual'}
-            onChange={() => setInputMode('manual')}
-          />
-          ラップ手入力（時計の表示を見ながら入力）
-        </label>
-      </fieldset>
+      {currentStep > 1 && (
+        <button type="button" className="step-back" onClick={goBack}>
+          ← 戻る
+        </button>
+      )}
 
-      {inputMode === 'fit' && (
-        <>
+      {currentStep === 1 && (
+        <section className="step step-1">
+          <p className="step-1-lede">
+            本命レースで目標を達成しよう。
+            <br />
+            レースデータをアップロードするだけで、AI相談用のプロンプトを生成します。
+          </p>
+          <h2 className="step-title">まずは入力方法を選んでください</h2>
+          <p className="step-1-helper">FITファイルをお持ちでない方は手動入力もできます</p>
+          <div className="mode-buttons">
+            <button
+              type="button"
+              className={`mode-button${inputMode === 'fit' ? ' is-selected' : ''}`}
+              onClick={() => setInputMode('fit')}
+            >
+              <span className="mode-button-title">FIT ファイル</span>
+              <span className="mode-button-desc">Garmin等のレースデータをアップロード</span>
+            </button>
+            <button
+              type="button"
+              className={`mode-button${inputMode === 'manual' ? ' is-selected' : ''}`}
+              onClick={() => setInputMode('manual')}
+            >
+              <span className="mode-button-title">ラップ手入力</span>
+              <span className="mode-button-desc">ラップタイムを直接入力</span>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {currentStep === 2 && inputMode === 'fit' && (
+        <section className="step step-2">
+          <h2 className="step-title">FIT ファイルをアップロード</h2>
           <FileUploader
             onParsed={(result) => {
               setParseResult(result);
@@ -184,55 +209,81 @@ function App() {
           {errorMessage && <p className="error">{errorMessage}</p>}
 
           {fitSegments.length > 0 && (
-            <section className="analysis">
-              <div className="scope-bar">
-                <span className="scope-label">範囲: {scopeLabel}</span>
-                {selectedLapIndex != null && (
-                  <button
-                    type="button"
-                    className="scope-reset"
-                    onClick={() => setSelectedLapIndex(null)}
-                  >
-                    全体に戻る
-                  </button>
-                )}
+            <>
+              <div className="analysis">
+                <div className="scope-bar">
+                  <span className="scope-label">範囲: {scopeLabel}</span>
+                  {selectedLapIndex != null && (
+                    <button
+                      type="button"
+                      className="scope-reset"
+                      onClick={() => setSelectedLapIndex(null)}
+                    >
+                      全体に戻る
+                    </button>
+                  )}
+                </div>
+                <SegmentControls size={segmentSize} onChange={setSegmentSize} />
+                <SegmentChart segments={fitSegments} />
               </div>
-              <SegmentControls size={segmentSize} onChange={setSegmentSize} />
-              <SegmentChart segments={fitSegments} />
-            </section>
+              {parseResult != null && (
+                <LapTable
+                  laps={laps}
+                  selectedIndex={selectedLapIndex}
+                  onSelect={setSelectedLapIndex}
+                />
+              )}
+            </>
           )}
-        </>
+        </section>
       )}
 
-      {inputMode === 'manual' && (
-        <ManualLapForm laps={manualLaps} onChange={setManualLaps} />
+      {currentStep === 2 && inputMode === 'manual' && (
+        <section className="step step-2">
+          <h2 className="step-title">ラップを入力</h2>
+          <ManualLapForm laps={manualLaps} onChange={setManualLaps} />
+        </section>
       )}
 
-      <section className="phase4">
-        <h2>AI 相談用プロンプト</h2>
-        <p className="phase4-recommend">
-          Gemini での使用を推奨します。各 Stage を <strong>同じチャット内</strong> で順に投げてください。前ステージの応答は次ステージで自動的に参照されます。
-        </p>
-        <Stage1Form values={raceForm} onChange={setRaceForm} />
-        {promptsReady ? (
-          <>
-            <PromptOutput stage={1} prompt={stage1Prompt} />
-            <PromptOutput stage={2} prompt={stage2Prompt} />
-            <PromptOutput stage={3} prompt={stage3Prompt} />
-          </>
-        ) : (
-          <p className="phase4-pending">
-            必須項目を入力するとプロンプトが表示されます: {missingFields.join('、')}
+      {currentStep === 3 && (
+        <section className="step step-3">
+          <h2 className="step-title">AI 相談用の情報を入力</h2>
+          <Stage1Form values={raceForm} onChange={setRaceForm} />
+          {!step3Valid && (
+            <p className="step-pending">
+              不足項目: {raceFormMissing.join('、')}
+            </p>
+          )}
+        </section>
+      )}
+
+      {currentStep === 4 && (
+        <section className="step step-4">
+          <h2 className="step-title">AI 相談用プロンプト</h2>
+          <p className="step-recommend">
+            Gemini での使用を推奨します。各 Stage を <strong>同じチャット内</strong> で順に投げてください。前ステージの応答は次ステージで自動的に参照されます。
           </p>
-        )}
-      </section>
+          <PromptOutput stage={1} prompt={stage1Prompt} />
+          <PromptOutput stage={2} prompt={stage2Prompt} />
+          <PromptOutput stage={3} prompt={stage3Prompt} />
+        </section>
+      )}
 
-      {inputMode === 'fit' && parseResult != null && (
-        <LapTable
-          laps={laps}
-          selectedIndex={selectedLapIndex}
-          onSelect={setSelectedLapIndex}
-        />
+      {currentStep < 4 && (
+        <div className="step-cta">
+          <button
+            type="button"
+            className="step-next"
+            onClick={goNext}
+            disabled={
+              (currentStep === 1 && !step1Valid) ||
+              (currentStep === 2 && !step2Valid) ||
+              (currentStep === 3 && !step3Valid)
+            }
+          >
+            次へ →
+          </button>
+        </div>
       )}
     </main>
   );

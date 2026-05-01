@@ -20,6 +20,7 @@ export type RaceFormValues = {
   raceDate: string;
   monthlyMileage: string;
   maxSingleRunDistance: string;
+  maxHr: string;
   subGoalDistance: GoalDistanceKey | '';
   subGoalDistanceCustom: string;
   subGoalTimeH: string;
@@ -37,6 +38,7 @@ export const emptyRaceForm: RaceFormValues = {
   raceDate: '',
   monthlyMileage: '',
   maxSingleRunDistance: '',
+  maxHr: '',
   subGoalDistance: '',
   subGoalDistanceCustom: '',
   subGoalTimeH: '',

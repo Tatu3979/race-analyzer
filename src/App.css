@@ -31,6 +31,157 @@
   line-height: 1.6;
 }
 
+.step-indicator {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Step navigation ---------- */
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.step-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.step-back {
+  align-self: flex-start;
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-pill);
+}
+
+.step-back:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.step-pending {
+  margin: 0;
+  padding: 10px 14px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--warn-text);
+}
+
+.step-recommend {
+  margin: 0;
+  padding: 10px 14px;
+  background: var(--info-bg);
+  border: 1px solid var(--info-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--info-text);
+}
+
+.step-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.step-next {
+  padding: 12px 32px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background: var(--accent-grad);
+  color: var(--text-inverse);
+  min-width: 200px;
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.step-next:hover:not(:disabled) {
+  background: var(--accent-grad-hover);
+}
+
+.step-next:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.step-next:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Step 1: hero & guidance ---------- */
+.step-1-lede {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.step-1-helper {
+  margin: -8px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ---------- Step 1: input mode big buttons ---------- */
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mode-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 20px 24px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.mode-button:hover {
+  border-color: var(--accent-blue);
+  background: var(--info-bg);
+}
+
+.mode-button.is-selected {
+  border-color: var(--accent-blue);
+  background: var(--info-bg);
+}
+
+.mode-button-title {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.mode-button-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 /* ---------- Generic surfaces ---------- */
 .input-mode,
 .race-form-section,
