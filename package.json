@@ -2,6 +2,8 @@
   "name": "race-analyzer",
   "private": true,
   "version": "0.0.0",
+  "license": "MIT",
+  "author": "中村竜也",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +11,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "notices": "node scripts/generate-notices.mjs"
   },
   "dependencies": {
     "fit-file-parser": "^2.3.3",
