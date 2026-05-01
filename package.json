@@ -1,7 +1,7 @@
 {
   "name": "race-analyzer",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "中村竜也",
   "type": "module",
